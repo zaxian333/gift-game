@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>🎄 交換禮物派對｜蓋牌同翻・撞車＝大號勝（Christmas v2.8）</title>
+<title>🎄 交換禮物派對｜蓋牌同翻・撞車＝大號勝（Christmas v2.8 fix）</title>
 <meta name="theme-color" content="#0b1329">
 <style>
 :root{
@@ -45,12 +45,14 @@ body:after{
                    radial-gradient(1.4px 1.4px at 80% 60%, rgba(255,255,255,.4), transparent 40%);
   animation:twinkle 6s linear infinite;
   opacity:.7;
+  pointer-events:none;
 }
 @keyframes twinkle{50%{filter:brightness(1.25)}}
 .snowflake{
   position:fixed;top:-10px;z-index:0;pointer-events:none;
   color:#fff;opacity:.9;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3));
   animation: fall linear forwards;
+  pointer-events:none;
 }
 @keyframes fall{ to{transform:translateY(110vh) rotate(360deg);opacity:.95} }
 .wrap{position:relative;z-index:1;max-width:1000px;margin:28px auto;padding:0 16px 80px}
@@ -79,6 +81,7 @@ input,select,button{
   padding:10px 12px;font-size:14px;outline:none;
 }
 input:focus,select:focus{box-shadow:0 0 0 2px rgba(120,255,210,.35)}
+button{cursor:pointer}
 .btn{cursor:pointer;background:linear-gradient(180deg,#1e2d63,#132653);transition:.15s; border:1px solid rgba(255,255,255,.18)}
 .btn:hover{filter:brightness(1.06) drop-shadow(0 4px 12px rgba(0,0,0,.25))}
 .btn-red{background:linear-gradient(180deg, #ff6b7b, #e14b59); border-color:rgba(255,255,255,.25)}
@@ -114,8 +117,8 @@ h2:after{
     <div class="row">
       <label>SUPABASE_URL <input id="SUPABASE_URL" size="34"/></label>
       <label>ANON_KEY <input id="SUPABASE_ANON_KEY" size="48"/></label>
-      <button class="btn btn-green" id="saveKeys">儲存到瀏覽器</button>
-      <button class="btn btn-red" id="btnTest">測試連線</button>
+      <button class="btn btn-green" id="saveKeys" type="button">儲存到瀏覽器</button>
+      <button class="btn btn-red" id="btnTest" type="button">測試連線</button>
     </div>
   </div>
 
@@ -124,8 +127,8 @@ h2:after{
       <h2>1) 主持人｜建立房間</h2>
       <div class="row">
         <input id="totalPlayers" type="number" min="2" max="100" value="8" placeholder="總人數 N"/>
-        <button class="btn btn-green" id="btnCreate">建立 6 位數字房號</button>
-        <button class="btn btn-red" id="btnEnd" disabled>公布結果（同翻）</button>
+        <button class="btn btn-green" id="btnCreate" type="button">建立 6 位數字房號</button>
+        <button class="btn btn-red" id="btnEnd" type="button" disabled>公布結果（同翻）</button>
       </div>
       <div id="hostInfo" class="muted" style="margin-top:8px"></div>
       <div class="small" id="capacityInfo"></div>
@@ -140,7 +143,7 @@ h2:after{
       <div class="row">
         <input id="joinCode" inputmode="numeric" pattern="\d*" placeholder="輸入 6 位數字房號" maxlength="6"/>
         <input id="playerName" placeholder="你的名字"/>
-        <button class="btn btn-green" id="btnJoin">加入</button>
+        <button class="btn btn-green" id="btnJoin" type="button">加入</button>
       </div>
       <div id="meBox" class="muted" style="margin-top:8px"></div>
       <div id="pickUI" class="hidden" style="margin-top:12px">
@@ -148,7 +151,7 @@ h2:after{
         <div class="row"><label>想偷的座位：
           <select id="targetSelect"></select>
         </label>
-        <button class="btn btn-red" id="btnPick">送出（可覆蓋）</button></div>
+        <button class="btn btn-red" id="btnPick" type="button">送出（可覆蓋）</button></div>
       </div>
     </section>
   </div>
@@ -162,13 +165,24 @@ h2:after{
 <div id="autoTimer">
   <span class="badge">倒數</span>
   <input id="tSec" type="number" min="5" max="180" value="30"/>
-  <button id="tStart" class="btn btn-green">開始</button>
+  <button id="tStart" class="btn btn-green" type="button">開始</button>
   <span class="badge" id="tLeft">未開始</span>
 </div>
 
 <div id="toast" style="display:none" class="toast"></div>
 
 <script type="module">
+// --- 使用 jsDelivr 取代 esm.sh，提升相容性 ---
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SB_URL_DEFAULT = "https://qcbhhfvkfjpazchaixzz.supabase.co";
+const SB_KEY_DEFAULT = "sb_publishable_WmO0PJW-WGP5kNNBJiAZtA_5hIdbr0x";
+
+const LS=window.localStorage
+const toastEl=document.querySelector('#toast')
+function toast(m){toastEl.textContent=m;toastEl.style.display='block';setTimeout(()=>toastEl.style.display='none',4200)}
+
+// 小裝飾（雪花）
 (function makeSnow(n=120){
   const frag=document.createDocumentFragment();
   for(let i=0;i<n;i++){
@@ -188,13 +202,6 @@ h2:after{
   document.body.appendChild(frag);
 })();
 
-const SB_URL_DEFAULT = "https://qcbhhfvkfjpazchaixzz.supabase.co";
-const SB_KEY_DEFAULT = "sb_publishable_WmO0PJW-WGP5kNNBJiAZtA_5hIdbr0x";
-
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-const LS=window.localStorage
-const toastEl=document.querySelector('#toast')
-function toast(m){toastEl.textContent=m;toastEl.style.display='block';setTimeout(()=>toastEl.style.display='none',4200)}
 const urlInput=document.querySelector('#SUPABASE_URL')
 const keyInput=document.querySelector('#SUPABASE_ANON_KEY')
 urlInput.value=(LS.getItem('SB_URL')||SB_URL_DEFAULT)
@@ -321,11 +328,13 @@ document.querySelector('#btnJoin').addEventListener('click',joinRoom)
 document.querySelector('#btnPick').addEventListener('click',sendPick)
 document.querySelector('#btnEnd').addEventListener('click',reveal)
 
+// 倒數
 ;(function(){ let timer=null,remain=0; const baseTitle=document.title; const input=document.querySelector('#tSec'); const left=document.querySelector('#tLeft'); const start=document.querySelector('#tStart');
   function setLeft(){ left.textContent=remain>0?(remain+' 秒'):'未開始'; document.title=(remain>0?('⏳'+remain+'s | '):'')+baseTitle.replace(/^⏳\d+s \| /,'')}
   start.addEventListener('click',()=>{ if(timer)clearInterval(timer); let s=parseInt(input.value||'30',10); if(isNaN(s))s=30; s=Math.max(5,Math.min(180,s)); remain=s; setLeft(); timer=setInterval(()=>{remain--; setLeft(); if(remain<=0){clearInterval(timer); timer=null; document.querySelector('#btnEnd')?.click()}},1000)})
 })()
 
+// 自動帶入網址參數 ?code=xxxxxx
 const urlCode=new URL(location.href).searchParams.get('code'); if(urlCode){ document.querySelector('#joinCode').value=urlCode.replace(/\D/g,'').slice(0,6) }
 </script>
 </body>
