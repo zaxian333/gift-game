@@ -1,36 +1,112 @@
-
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>多人交換禮物｜蓋牌同翻・撞車＝大號勝（v2.7 GitHub Pages）</title>
-  <meta name="description" content="多人交換禮物小工具（Supabase Realtime），支援蓋牌、同時揭露、撞車大號勝、總人數與裝置鎖。"/>
-  <style>
-  :root {{--bg:#0b1020;--card:#121a33;--text:#eaf0ff;--muted:#9eb2e6;--line:rgba(255,255,255,.1);--accent:#6ae3ff;--good:#75ffa3;--bad:#ff8a9b}}
-  html,body {{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans",Arial}}
-  .wrap {{max-width:980px;margin:24px auto;padding:0 16px 64px}}
-  .card {{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}}
-  .row {{display:flex;gap:8px;flex-wrap:wrap;align-items:center}}
-  .grid {{display:grid;gap:12px}} .g2 {{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media (max-width:800px){{.g2{{grid-template-columns:1fr}}}}
-  input,select,button {{background:#0f1730;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}}
-  button {{cursor:pointer}} .btn {{background:linear-gradient(180deg,#1d2b57,#162247)}} .btn-ghost {{background:#0f1730}}
-  h1 {{font-size:clamp(22px,3vw,30px);margin:0 0 8px}} h2 {{font-size:clamp(18px,2.4vw,22px);color:var(--accent);margin:12px 0 8px}}
-  .table {{width:100%;border-collapse:collapse}} .table th,.table td {{border-bottom:1px dashed var(--line);padding:8px}}
-  .kbd {{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d142b;border:1px solid var(--line);padding:2px 6px;border-radius:6px}}
-  .tag {{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:#0d142b;color:#cfe3ff;font-size:12px}}
-  .muted {{color:var(--muted)}} .ok{{color:var(--good)}} .bad{{color:var(--bad)}} .hidden{{display:none}} .small{{font-size:12px;color:var(--muted)}}
-  .toast{{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#18224a;color:#fff;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:99999;max-width:90vw;font-size:14px}}
-  #autoTimer{{position:fixed;right:16px;bottom:16px;z-index:9999;display:flex;gap:8px;align-items:center;background:#0f1730;border:1px solid rgba(255,255,255,.15);padding:8px 10px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}}
-  #autoTimer input{{width:72px;background:#0d142b;color:#eaf0ff;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px}}
-  #autoTimer button{{background:linear-gradient(180deg,#1d2b57,#162247);color:#eaf0ff;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 10px;cursor:pointer}}
-  #autoTimer .badge{{padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:#0d142b;color:#cfe3ff}}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>🎄 交換禮物派對｜蓋牌同翻・撞車＝大號勝（Christmas v2.8）</title>
+<meta name="theme-color" content="#0b1329">
+<style>
+:root{
+  --bg1:#07111f;
+  --bg2:#0c1a36;
+  --card:#0e1d3f;
+  --text:#eaf4ff;
+  --muted:#b7c8ff;
+  --line:rgba(255,255,255,.14);
+  --accent:#79ffe1;
+  --xmas-red:#ff5d6c;
+  --xmas-green:#2ecc7a;
+  --gold:#ffd36b;
+  --good:#7CFFB4;
+  --bad:#FF9BA6;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",Arial}
+body{
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(255,255,255,.06), transparent 40%),
+    radial-gradient(1200px 800px at 90% -10%, rgba(255,255,255,.05), transparent 40%),
+    radial-gradient(1200px 800px at 50% -10%, rgba(255,255,255,.05), transparent 40%),
+    linear-gradient(180deg, var(--bg2), var(--bg1));
+  overflow-x:hidden;
+}
+body:after{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(1200px 600px at 50% -10%, transparent, rgba(0,0,0,.25)),
+             radial-gradient(1600px 800px at 50% 130%, rgba(0,0,0,.45), transparent 60%);
+  z-index:0;
+}
+.twinkles{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.6), transparent 40%),
+                   radial-gradient(1.5px 1.5px at 30% 80%, rgba(255,255,255,.5), transparent 40%),
+                   radial-gradient(1.2px 1.2px at 70% 30%, rgba(255,255,255,.45), transparent 40%),
+                   radial-gradient(1.4px 1.4px at 80% 60%, rgba(255,255,255,.4), transparent 40%);
+  animation:twinkle 6s linear infinite;
+  opacity:.7;
+}
+@keyframes twinkle{50%{filter:brightness(1.25)}}
+.snowflake{
+  position:fixed;top:-10px;z-index:0;pointer-events:none;
+  color:#fff;opacity:.9;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3));
+  animation: fall linear forwards;
+}
+@keyframes fall{ to{transform:translateY(110vh) rotate(360deg);opacity:.95} }
+.wrap{position:relative;z-index:1;max-width:1000px;margin:28px auto;padding:0 16px 80px}
+h1{margin:0 0 10px;font-size:clamp(22px,3.4vw,32px);display:flex;gap:8px;align-items:center}
+h1 .tag{font-size:.8em}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;background:rgba(255,255,255,.06)}
+.muted{color:var(--muted)}
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+  position:relative;
+}
+.card:before{
+  content:"";position:absolute;inset:-1px;border-radius:18px;
+  padding:1px;background:linear-gradient(145deg, rgba(255,214,107,.5), rgba(255,255,255,0) 40%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:880px){.g2{grid-template-columns:1fr}}
+input,select,button{
+  background:#0f214a;color:var(--text);border:1px solid var(--line);border-radius:12px;
+  padding:10px 12px;font-size:14px;outline:none;
+}
+input:focus,select:focus{box-shadow:0 0 0 2px rgba(120,255,210,.35)}
+.btn{cursor:pointer;background:linear-gradient(180deg,#1e2d63,#132653);transition:.15s; border:1px solid rgba(255,255,255,.18)}
+.btn:hover{filter:brightness(1.06) drop-shadow(0 4px 12px rgba(0,0,0,.25))}
+.btn-red{background:linear-gradient(180deg, #ff6b7b, #e14b59); border-color:rgba(255,255,255,.25)}
+.btn-red:hover{box-shadow:0 0 0 2px rgba(255,90,104,.3)}
+.btn-green{background:linear-gradient(180deg, #32d282, #22b46c); border-color:rgba(255,255,255,.25)}
+.btn-green:hover{box-shadow:0 0 0 2px rgba(74,237,158,.35)}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px dashed var(--line);padding:8px 6px}
+.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b1a3d;border:1px solid var(--line);padding:2px 6px;border-radius:6px}
+.hidden{display:none}
+.small{font-size:12px;color:var(--muted)}
+.ok{color:var(--good)} .bad{color:var(--bad)}
+#autoTimer{position:fixed;right:16px;bottom:16px;z-index:5;display:flex;gap:8px;align-items:center;background:#0f214a;border:1px solid var(--line);padding:8px 10px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+#autoTimer input{width:72px;background:#0b1a3d;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px}
+#autoTimer .badge{padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:#0b1a3d;color:#d7e7ff}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#172856;color:#fff;padding:10px 14px;border-radius:10px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:6;max-width:90vw;font-size:14px}
+h2{font-size:clamp(18px,2.4vw,22px);margin:12px 0 8px;color:#dffbf2;position:relative}
+h2:after{
+  content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:8px;
+  background:radial-gradient(circle at 35% 35%, #fff, #ffe3a6 40%, #ffb34d 60%, transparent 70%);
+  box-shadow:0 0 10px 3px rgba(255,196,84,.6);
+}
+</style>
 </head>
 <body>
+<div class="twinkles"></div>
 <div class="wrap">
-  <h1>多人交換禮物｜<span class="tag">蓋牌同翻</span>・<span class="tag">撞車＝大號勝</span> <span class="muted">v2.7（GitHub Pages）</span></h1>
+  <h1>🎄 交換禮物派對 <span class="tag">蓋牌同翻</span> <span class="tag">撞車＝大號勝</span> <span class="muted">Christmas v2.8</span></h1>
   <p class="muted">房號為 <b>6 位純數字</b>；主持人先設定總人數（N），加入時會在 1..N 隨機分配座位；額滿即止；同裝置同房只佔一席；揭露前只顯示「已送出/尚未選擇」。</p>
 
   <div class="card">
@@ -38,8 +114,8 @@
     <div class="row">
       <label>SUPABASE_URL <input id="SUPABASE_URL" size="34"/></label>
       <label>ANON_KEY <input id="SUPABASE_ANON_KEY" size="48"/></label>
-      <button class="btn" id="saveKeys">儲存到瀏覽器</button>
-      <button class="btn-ghost" id="btnTest">測試連線</button>
+      <button class="btn btn-green" id="saveKeys">儲存到瀏覽器</button>
+      <button class="btn btn-red" id="btnTest">測試連線</button>
     </div>
   </div>
 
@@ -48,8 +124,8 @@
       <h2>1) 主持人｜建立房間</h2>
       <div class="row">
         <input id="totalPlayers" type="number" min="2" max="100" value="8" placeholder="總人數 N"/>
-        <button class="btn" id="btnCreate">建立 6 位數字房號</button>
-        <button class="btn-ghost" id="btnEnd" disabled>公布結果（同翻）</button>
+        <button class="btn btn-green" id="btnCreate">建立 6 位數字房號</button>
+        <button class="btn btn-red" id="btnEnd" disabled>公布結果（同翻）</button>
       </div>
       <div id="hostInfo" class="muted" style="margin-top:8px"></div>
       <div class="small" id="capacityInfo"></div>
@@ -64,7 +140,7 @@
       <div class="row">
         <input id="joinCode" inputmode="numeric" pattern="\d*" placeholder="輸入 6 位數字房號" maxlength="6"/>
         <input id="playerName" placeholder="你的名字"/>
-        <button class="btn" id="btnJoin">加入</button>
+        <button class="btn btn-green" id="btnJoin">加入</button>
       </div>
       <div id="meBox" class="muted" style="margin-top:8px"></div>
       <div id="pickUI" class="hidden" style="margin-top:12px">
@@ -72,7 +148,7 @@
         <div class="row"><label>想偷的座位：
           <select id="targetSelect"></select>
         </label>
-        <button class="btn" id="btnPick">送出（可覆蓋）</button></div>
+        <button class="btn btn-red" id="btnPick">送出（可覆蓋）</button></div>
       </div>
     </section>
   </div>
@@ -86,30 +162,49 @@
 <div id="autoTimer">
   <span class="badge">倒數</span>
   <input id="tSec" type="number" min="5" max="180" value="30"/>
-  <button id="tStart">開始</button>
+  <button id="tStart" class="btn btn-green">開始</button>
   <span class="badge" id="tLeft">未開始</span>
 </div>
 
 <div id="toast" style="display:none" class="toast"></div>
 
 <script type="module">
+(function makeSnow(n=120){
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<n;i++){
+    const s=document.createElement('div');
+    s.className='snowflake'; s.textContent='✦';
+    const size= Math.random()*1.2 + 0.6;
+    const dur= 8 + Math.random()*14;
+    const delay= Math.random()*-20;
+    const x= Math.random()*100;
+    s.style.left = x + 'vw';
+    s.style.fontSize = size + 'em';
+    s.style.animationDuration = dur + 's';
+    s.style.animationDelay = delay + 's';
+    s.style.opacity = 0.65 + Math.random()*0.35;
+    frag.appendChild(s);
+  }
+  document.body.appendChild(frag);
+})();
+
 const SB_URL_DEFAULT = "https://qcbhhfvkfjpazchaixzz.supabase.co";
 const SB_KEY_DEFAULT = "sb_publishable_WmO0PJW-WGP5kNNBJiAZtA_5hIdbr0x";
-import {{ createClient }} from 'https://esm.sh/@supabase/supabase-js@2'
 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const LS=window.localStorage
 const toastEl=document.querySelector('#toast')
-function toast(m){{toastEl.textContent=m;toastEl.style.display='block';setTimeout(()=>toastEl.style.display='none',4200)}}
+function toast(m){toastEl.textContent=m;toastEl.style.display='block';setTimeout(()=>toastEl.style.display='none',4200)}
 const urlInput=document.querySelector('#SUPABASE_URL')
 const keyInput=document.querySelector('#SUPABASE_ANON_KEY')
 urlInput.value=(LS.getItem('SB_URL')||SB_URL_DEFAULT)
 keyInput.value=(LS.getItem('SB_KEY')||SB_KEY_DEFAULT)
-document.querySelector('#saveKeys').addEventListener('click',()=>{{LS.setItem('SB_URL',urlInput.value.trim());LS.setItem('SB_KEY',keyInput.value.trim());toast('已儲存到瀏覽器')}})
+document.querySelector('#saveKeys').addEventListener('click',()=>{LS.setItem('SB_URL',urlInput.value.trim());LS.setItem('SB_KEY',keyInput.value.trim());toast('已儲存到瀏覽器')})
 
-function getDeviceId(){{ let id=LS.getItem('DEVICE_ID'); if(!id){{ id=crypto.randomUUID?.() || (Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)); LS.setItem('DEVICE_ID', id) }} return id }}
+function getDeviceId(){ let id=LS.getItem('DEVICE_ID'); if(!id){ id=crypto.randomUUID?.() || (Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)); LS.setItem('DEVICE_ID', id) } return id }
 let supabase=null
-function connect(){{ const url=(urlInput.value.trim()||LS.getItem('SB_URL')||SB_URL_DEFAULT); const key=(keyInput.value.trim()||LS.getItem('SB_KEY')||SB_KEY_DEFAULT); if(!url||!key){{toast('請先貼上 Publishable (anon) key');return null}} supabase=createClient(url,key); return supabase }}
-document.querySelector('#btnTest').addEventListener('click',async()=>{{ if(!connect())return; const {{error}}=await supabase.from('rooms').select('count',{{count:'exact',head:true}}); toast(error?('Key 測試失敗：'+error.message):'Key 測試成功') }})
+function connect(){ const url=(urlInput.value.trim()||LS.getItem('SB_URL')||SB_URL_DEFAULT); const key=(keyInput.value.trim()||LS.getItem('SB_KEY')||SB_KEY_DEFAULT); if(!url||!key){toast('請先貼上 Publishable (anon) key');return null} supabase=createClient(url,key); return supabase }
+document.querySelector('#btnTest').addEventListener('click',async()=>{ if(!connect())return; const {error}=await supabase.from('rooms').select('count',{count:'exact',head:true}); toast(error?('Key 測試失敗：'+error.message):'Key 測試成功') })
 
 let room=null, me=null, allPicks=[]
 const hostInfo=document.querySelector('#hostInfo')
@@ -119,118 +214,119 @@ const picksBox=document.querySelector('#picksBox')
 const resultCard=document.querySelector('#resultCard')
 const resultBox=document.querySelector('#resultBox')
 
-function statusLabelSecret(p){{ return p.submitted?'<b>已送出</b>':'<span class="muted">尚未選擇</span>' }}
-function statusLabelReveal(p){{ return (p.target===0)?'<span class="muted">PASS</span>':'#'+p.target }}
+function statusLabelSecret(p){ return p.submitted?'<b>已送出</b>':'<span class="muted">尚未選擇</span>' }
+function statusLabelReveal(p){ return (p.target===0)?'<span class="muted">PASS</span>':'#'+p.target }
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,(c)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])) }
 
-function renderHost(){{
-  if(!room){{ hostInfo.innerHTML=''; playersBox.innerHTML=''; picksBox.innerHTML=''; capacityInfo.textContent=''; return }}
-  hostInfo.innerHTML=`房號 <span class="kbd>${{room.code}}</span>　狀態：<span class="tag">${{room.status}}</span>　人數：<b>${{room.total_players||'?'}}</b>`
+function renderHost(){
+  if(!room){ hostInfo.innerHTML=''; playersBox.innerHTML=''; picksBox.innerHTML=''; capacityInfo.textContent=''; return }
   const sorted=[...allPicks].sort((a,b)=>a.seat-b.seat)
   const showReal=room.status==='revealed'
   const N = room.total_players || Math.max(sorted.length,1)
   const used = new Set(sorted.map(p=>p.seat))
-  const remain = Array.from({{length:N}}, (_,i)=>i+1).filter(n=>!used.has(n))
-  capacityInfo.textContent = `已加入 ${{sorted.length}}/${{N}}　剩餘座位：${{remain.length?('#'+remain.join('、#')):'（滿）'}}`
+  const remain = Array.from({length:N}, (_,i)=>i+1).filter(n=>!used.has(n))
+  capacityInfo.textContent = `已加入 ${sorted.length}/${N}　剩餘座位：${remain.length?('#'+remain.join('、#')):'（滿）'}`
   playersBox.innerHTML=`<table class="table"><thead><tr><th>座位</th><th>玩家</th></tr></thead><tbody>${
-    sorted.map(p=>`<tr><td>#${{p.seat}}</td><td>${{escapeHtml(p.name)}}</td></tr>`).join('')
+    sorted.map(p=>`<tr><td>#${p.seat}</td><td>${escapeHtml(p.name)}</td></tr>`).join('')
   }</tbody></table>`
   picksBox.innerHTML=`<table class="table"><thead><tr><th>座位</th><th>玩家</th><th>偷牌</th></tr></thead><tbody>${
-    sorted.map(p=>`<tr><td>#${{p.seat}}</td><td>${{escapeHtml(p.name)}}</td><td>${{showReal?statusLabelReveal(p):statusLabelSecret(p)}}</td></tr>`).join('')
+    sorted.map(p=>`<tr><td>#${p.seat}</td><td>${escapeHtml(p.name)}</td><td>${showReal?statusLabelReveal(p):statusLabelSecret(p)}</td></tr>`).join('')
   }</tbody></table>`
   document.querySelector('#btnEnd').disabled=(allPicks.length===0)
-}}
+  hostInfo.innerHTML = `房號 <span class="kbd">${room.code}</span>　狀態：<span class="tag">${room.status}</span>　人數：<b>${room.total_players||'?'}</b>`
+}
 
-function renderPlayer(){{
+function renderPlayer(){
   const meBox=document.querySelector('#meBox'), pickUI=document.querySelector('#pickUI'), targetSel=document.querySelector('#targetSelect')
-  if(!me){{ meBox.textContent=''; pickUI.classList.add('hidden'); return }}
-  meBox.innerHTML=`你是 <b>#${{me.seat}}</b>・${{escapeHtml(me.name)}}　房號 <span class='kbd'>${{room.code}}</span>`
+  if(!me){ meBox.textContent=''; pickUI.classList.add('hidden'); return }
+  meBox.innerHTML=`你是 <b>#${me.seat}</b>・${escapeHtml(me.name)}　房號 <span class='kbd'>${room.code}</span>`
   pickUI.classList.remove('hidden')
   const N = room?.total_players || Math.max(...allPicks.map(p=>p.seat), me.seat, 1)
-  targetSel.innerHTML = `<option value="0">PASS</option>` + Array.from({{length:N}},(_,i)=>i+1).map(n=>`<option value="${{n}}" ${{me.target===n?'selected':''}}>#${{n}}</option>`).join('')
-}}
+  targetSel.innerHTML = `<option value="0">PASS</option>` + Array.from({length:N},(_,i)=>i+1).map(n=>`<option value="${n}" ${me.target===n?'selected':''}>#${n}</option>`).join('')
+}
 
-async function createRoom(){{
+function genCode(n){ let s=''; for(let i=0;i<n;i++) s+=Math.floor(Math.random()*10); return s }
+
+async function createRoom(){
   if(!connect())return
   const N = Math.max(2, Math.min(100, parseInt(document.querySelector('#totalPlayers').value||'8',10) || 8))
   const code = genCode(6)
-  const {{data,error}}=await supabase.from('rooms').insert({{code,status:'picking', total_players:N}}).select().single()
-  if(error){{toast('建房失敗：'+error.message);return}}
-  room=data; subscribeRoom(room.id); subscribePicks(room.id); renderHost(); toast(`房間建立成功（人數 ${{N}}）`)
-}}
+  const {data,error}=await supabase.from('rooms').insert({code,status:'picking', total_players:N}).select().single()
+  if(error){toast('建房失敗：'+error.message);return}
+  room=data; subscribeRoom(room.id); subscribePicks(room.id); renderHost(); toast(`房間建立成功（人數 ${N}）`)
+}
 
-async function joinRoom(){{
+async function joinRoom(){
   if(!connect())return
   const raw=(document.querySelector('#joinCode').value||new URL(location.href).searchParams.get('code')||'').trim()
   const code = raw.replace(/\D/g,'')
   const name=(document.querySelector('#playerName').value||'').trim()
-  if(!code||code.length!==6){{toast('請輸入 6 位數字房號');return}}
-  if(!name){{toast('請輸入名字');return}}
-  const {{data:r,error:e1}}=await supabase.from('rooms').select('*').eq('code',code).single()
-  if(e1||!r){{toast('找不到房間');return}}
+  if(!code||code.length!==6){toast('請輸入 6 位數字房號');return}
+  if(!name){toast('請輸入名字');return}
+  const {data:r,error:e1}=await supabase.from('rooms').select('*').eq('code',code).single()
+  if(e1||!r){toast('找不到房間');return}
   room=r; subscribeRoom(room.id); subscribePicks(room.id)
 
   const N = room.total_players || 0
-  if(!N){{ toast('此房未設定總人數，請主持人重新建房'); return }}
+  if(!N){ toast('此房未設定總人數，請主持人重新建房'); return }
 
   const deviceId=getDeviceId()
-  const {{data:exist}}=await supabase.from('picks').select('*').eq('room_id',room.id).eq('device_id',deviceId).maybeSingle()
-  if(exist){{ me=exist; renderPlayer(); renderHost(); toast(`本裝置已加入，號碼是 #${{exist.seat}}`); return }}
+  const {data:exist}=await supabase.from('picks').select('*').eq('room_id',room.id).eq('device_id',deviceId).maybeSingle()
+  if(exist){ me=exist; renderPlayer(); renderHost(); toast(`本裝置已加入，號碼是 #${exist.seat}`); return }
 
-  const {{data:picks}}=await supabase.from('picks').select('seat').eq('room_id',room.id)
+  const {data:picks}=await supabase.from('picks').select('seat').eq('room_id',room.id)
   const usedSet = new Set((picks||[]).map(p=>p.seat))
-  const remain = Array.from({{length:N}}, (_,i)=>i+1).filter(n=>!usedSet.has(n))
-  if(remain.length===0){{ toast('本房已額滿，無法加入'); return }}
+  const remain = Array.from({length:N}, (_,i)=>i+1).filter(n=>!usedSet.has(n))
+  if(remain.length===0){ toast('本房已額滿，無法加入'); return }
 
   const seat = remain[Math.floor(Math.random()*remain.length)]
-  const {{data:mine,error:e2}}=await supabase.from('picks').insert({{room_id:room.id, seat, name, target:0, submitted:false, device_id:deviceId}}).select().single()
-  if(e2){{toast('加入失敗：'+e2.message);return}}
-  me=mine; renderPlayer(); renderHost(); toast(`加入成功，你的號碼是 #${{seat}}`)
-}}
+  const {data:mine,error:e2}=await supabase.from('picks').insert({room_id:room.id, seat, name, target:0, submitted:false, device_id:deviceId}).select().single()
+  if(e2){toast('加入失敗：'+e2.message);return}
+  me=mine; renderPlayer(); renderHost(); toast(`加入成功，你的號碼是 #${seat}`)
+}
 
-async function sendPick(){{
-  if(!connect()||!me){{toast('尚未加入');return}}
+async function sendPick(){
+  if(!connect()||!me){toast('尚未加入');return}
   const t=+document.querySelector('#targetSelect').value
-  const payload={{room_id:me.room_id, seat:me.seat, name:me.name, target:t, submitted:true, device_id:me.device_id}}
-  const {{data,error}}=await supabase.from('picks').upsert(payload, {{ onConflict: 'room_id,seat' }}).select().single()
-  if(error){{toast('送出失敗：'+error.message);return}}
+  const payload={room_id:me.room_id, seat:me.seat, name:me.name, target:t, submitted:true, device_id:me.device_id}
+  const {data,error}=await supabase.from('picks').upsert(payload, { onConflict: 'room_id,seat' }).select().single()
+  if(error){toast('送出失敗：'+error.message);return}
   me=data; renderPlayer()
-}}
+}
 
-async function reveal(){{
+async function reveal(){
   if(!connect()||!room)return
-  const {{data:picks,error}}=await supabase.from('picks').select('*').eq('room_id',room.id)
-  if(error){{toast('讀取失敗：'+error.message);return}}
-  const groups=new Map(); for(const p of picks){{ const t=p.target||0; if(t>0){{ if(!groups.has(t))groups.set(t,[]); groups.get(t).push(p.seat) }} }}
+  const {data:picks,error}=await supabase.from('picks').select('*').eq('room_id',room.id)
+  if(error){toast('讀取失敗：'+error.message);return}
+  const groups=new Map(); for(const p of picks){ const t=p.target||0; if(t>0){ if(!groups.has(t))groups.set(t,[]); groups.get(t).push(p.seat) } }
   const successes=[], logs=[]
-  for(const [target,seats] of groups){{
-    if(seats.length>=2){{ const winner=Math.max(...seats); successes.push({{thief:winner,target}}); const losers=seats.filter(s=>s!==winner); logs.push(`多人瞄準 #${{target}} → <b class="ok">#${{winner}} 成功</b>（大號勝），<span class="bad">${{losers.map(s=>'#'+s).join('、')}}</span> 失敗`) }}
-    else if(seats.length===1){{ successes.push({{thief:seats[0],target}}); logs.push(`單獨瞄準 #${{target}} → <b class="ok">#${{seats[0]}} 成功</b>`) }}
-  }}
+  for(const [target,seats] of groups){
+    if(seats.length>=2){ const winner=Math.max(...seats); successes.push({thief:winner,target}); const losers=seats.filter(s=>s!==winner); logs.push(`多人瞄準 #${target} → <b class="ok">#${winner} 成功</b>（大號勝），<span class="bad">${losers.map(s=>'#'+s).join('、')}</span> 失敗`) }
+    else if(seats.length===1){ successes.push({thief:seats[0],target}); logs.push(`單獨瞄準 #${target} → <b class="ok">#${seats[0]} 成功</b>`) }
+  }
   const N = room.total_players || picks.length
-  const holding=Array.from({{length:N+1}},(_,i)=>i)
-  for(const {{thief,target}} of successes){{ const tg=holding[target]; const th=holding[thief]; holding[target]=th; holding[thief]=tg }}
-  const result={{logs,successes,after:holding}}
-  const {{error:e2}}=await supabase.from('rooms').update({{status:'revealed', result_json:result}}).eq('id',room.id)
-  if(e2){{toast('更新結果失敗：'+e2.message)}}
-}}
+  const holding=Array.from({length:N+1},(_,i)=>i)
+  for(const {thief,target} of successes){ const tg=holding[target]; const th=holding[thief]; holding[target]=th; holding[thief]=tg }
+  const result={logs,successes,after:holding}
+  const {error:e2}=await supabase.from('rooms').update({status:'revealed', result_json:result}).eq('id',room.id)
+  if(e2){toast('更新結果失敗：'+e2.message)}
+}
 
-function subscribeRoom(room_id){{ supabase.channel('rooms:'+room_id).on('postgres_changes',{{event:'*',schema:'public',table:'rooms',filter:`id=eq.${{room_id}}`}},payload=>{{ room=payload.new; if(room.status==='revealed'&&room.result_json){{showResult(room.result_json)}}; renderHost() }}).subscribe() }}
-function subscribePicks(room_id){{ supabase.channel('picks:'+room_id).on('postgres_changes',{{event:'*',schema:'public',table:'picks',filter:`room_id=eq.${{room_id}}`}},async()=>{{ const {{data}}=await supabase.from('picks').select('*').eq('room_id',room_id); allPicks=data||[]; renderHost(); renderPlayer(); updateTargetOptions() }}).subscribe() }}
-function updateTargetOptions(){{ if(!me)return; const sel=document.querySelector('#targetSelect'); if(!sel)return; const N = room?.total_players || Math.max(...allPicks.map(p=>p.seat), me.seat, 1); sel.innerHTML=`<option value="0">PASS</option>`+Array.from({{length:N}},(_,i)=>i+1).map(n=>`<option value="${{n}}" ${{me.target===n?'selected':''}}>#${{n}}</option>`).join('') }}
-function showResult(r){{ resultCard.classList.remove('hidden'); resultBox.innerHTML=`<div class="grid g2"><div><h3>揭示紀錄</h3>${{r.logs&&r.logs.length?r.logs.map(x=>`<div>• `+x+`</div>`).join(''):'<div class="muted">無人出手</div>'}}</div><div><h3>口訣</h3><div class="muted">蓋牌同翻 → <b>撞車大號勝</b> → 未撞車同時成功 → 成功即 <b>1 換 1</b>（上鎖）。</div></div></div>` }}
+function subscribeRoom(room_id){ supabase.channel('rooms:'+room_id).on('postgres_changes',{event:'*',schema:'public',table:'rooms',filter:`id=eq.${room_id}`},payload=>{ room=payload.new; if(room.status==='revealed'&&room.result_json){showResult(room.result_json)}; renderHost() }).subscribe() }
+function subscribePicks(room_id){ supabase.channel('picks:'+room_id).on('postgres_changes',{event:'*',schema:'public',table:'picks',filter:`room_id=eq.${room_id}`},async()=>{ const {data}=await supabase.from('picks').select('*').eq('room_id',room_id); allPicks=data||[]; renderHost(); renderPlayer(); updateTargetOptions() }).subscribe() }
+function updateTargetOptions(){ if(!me)return; const sel=document.querySelector('#targetSelect'); if(!sel)return; const N = room?.total_players || Math.max(...allPicks.map(p=>p.seat), me.seat, 1); sel.innerHTML=`<option value="0">PASS</option>`+Array.from({length:N},(_,i)=>i+1).map(n=>`<option value="${n}" ${me.target===n?'selected':''}>#${n}</option>`).join('') }
+function showResult(r){ resultCard.classList.remove('hidden'); resultBox.innerHTML=`<div class="grid g2"><div><h3>揭示紀錄</h3>${r.logs&&r.logs.length?r.logs.map(x=>`<div>• `+x+`</div>`).join(''):'<div class="muted">無人出手</div>'}</div><div><h3>口訣</h3><div class="muted">蓋牌同翻 → <b>撞車大號勝</b> → 未撞車同時成功 → 成功即 <b>1 換 1</b>（上鎖）。</div></div></div>` }
 document.querySelector('#btnCreate').addEventListener('click',createRoom)
 document.querySelector('#btnJoin').addEventListener('click',joinRoom)
 document.querySelector('#btnPick').addEventListener('click',sendPick)
 document.querySelector('#btnEnd').addEventListener('click',reveal)
 
-;(function(){{ let timer=null,remain=0; const baseTitle=document.title; const input=document.querySelector('#tSec'); const left=document.querySelector('#tLeft'); const start=document.querySelector('#tStart');
-  function setLeft(){{ left.textContent=remain>0?(remain+' 秒'):'未開始'; document.title=(remain>0?('⏳'+remain+'s | '):'')+baseTitle.replace(/^⏳\d+s \| /,'')}}
-  start.addEventListener('click',()=>{{ if(timer)clearInterval(timer); let s=parseInt(input.value||'30',10); if(isNaN(s))s=30; s=Math.max(5,Math.min(180,s)); remain=s; setLeft(); timer=setInterval(()=>{{remain--; setLeft(); if(remain<=0){{clearInterval(timer); timer=null; document.querySelector('#btnEnd')?.click()}}}},1000)}})
-}})()
+;(function(){ let timer=null,remain=0; const baseTitle=document.title; const input=document.querySelector('#tSec'); const left=document.querySelector('#tLeft'); const start=document.querySelector('#tStart');
+  function setLeft(){ left.textContent=remain>0?(remain+' 秒'):'未開始'; document.title=(remain>0?('⏳'+remain+'s | '):'')+baseTitle.replace(/^⏳\d+s \| /,'')}
+  start.addEventListener('click',()=>{ if(timer)clearInterval(timer); let s=parseInt(input.value||'30',10); if(isNaN(s))s=30; s=Math.max(5,Math.min(180,s)); remain=s; setLeft(); timer=setInterval(()=>{remain--; setLeft(); if(remain<=0){clearInterval(timer); timer=null; document.querySelector('#btnEnd')?.click()}},1000)})
+})()
 
-const urlCode=new URL(location.href).searchParams.get('code'); if(urlCode){{ document.querySelector('#joinCode').value=urlCode.replace(/\D/g,'').slice(0,6) }}
-function genCode(n){{ let s=''; for(let i=0;i<n;i++){{ s+=Math.floor(Math.random()*10) }} return s }}
-function escapeHtml(s){{ return (s||'').replace(/[&<>"']/g,function(c){{return {{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}}[c];}}) }}
+const urlCode=new URL(location.href).searchParams.get('code'); if(urlCode){ document.querySelector('#joinCode').value=urlCode.replace(/\D/g,'').slice(0,6) }
 </script>
 </body>
 </html>
